@@ -1,14 +1,23 @@
 const boardsRepo = require('./board.memory.repository');
 const tasksRepo = require('../tasks/task.memory.repository');
-// тут обработка данных перед бд или клиентом
 
-const getAll = () => boardsRepo.getAll();
-const getById = id => boardsRepo.getById(id);
-const save = board => boardsRepo.save(board);
-const update = board => boardsRepo.update(board);
-const deleteItem = id => {
-  tasksRepo.deleteBoardTasks(id);
-  return boardsRepo.deleteItem(id);
+const getAllBoards = () => boardsRepo.getAllBoards();
+const getBoardById = id => boardsRepo.getBoardById(id);
+const createBoard = board => boardsRepo.createBoard(board);
+const updateBoard = board => boardsRepo.updateBoard(board);
+const deleteBoard = async id => {
+  try {
+    tasksRepo.deleteBoardTasks(id);
+    await boardsRepo.deleteBoard(id);
+  } catch (err) {
+    throw new Error(err);
+  }
 };
 
-module.exports = { getAll, getById, save, update, deleteItem };
+module.exports = {
+  getAllBoards,
+  getBoardById,
+  createBoard,
+  updateBoard,
+  deleteBoard
+};

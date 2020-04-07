@@ -1,35 +1,29 @@
-const db = [
-  {
-    id: '1',
-    name: 'Dima',
-    login: 'dima '
-  },
-  {
-    id: '2',
-    name: 'Dima2',
-    login: 'dima2 '
-  }
-];
-// обращение к БД тут
+const db = [];
+// appeal to the database here
 
-const getAll = async () => db;
+const getAllUsers = async () => db;
 
-const getById = async id => db.find(item => item.id === id);
+const getUserById = async id => db.find(item => item.id === id);
 
-const save = async user => db.push(user);
+const createUser = async user => db.push(user);
 
-const update = async user => {
-  const item = await getById(user.id);
+const updateUser = async user => {
+  const item = await getUserById(user.id);
   const index = db.indexOf(item);
   db[index] = user;
 };
 
-const deleteItem = async id => {
-  const item = await getById(id);
+const deleteUser = async id => {
+  const item = await getUserById(id);
   const index = db.indexOf(item);
-  db.splice(index, 1);
 
-  return db;
+  db.splice(index, 1);
 };
 
-module.exports = { getAll, getById, save, update, deleteItem };
+module.exports = {
+  getAllUsers,
+  getUserById,
+  createUser,
+  updateUser,
+  deleteUser
+};
