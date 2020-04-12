@@ -61,7 +61,7 @@ router.route('/:id').put(async (req, res, next) => {
   }
 });
 
-router.route('/:id').delete(async (req, res) => {
+router.route('/:id').delete(async (req, res, next) => {
   try {
     const task = await tasksService.deleteTask(
       req.params.id,
@@ -69,13 +69,13 @@ router.route('/:id').delete(async (req, res) => {
     );
 
     if (!task) {
-      res.status(404).send('Task not found');
+      const err = new createError(404, 'Task not found');
+      return next(err);
     }
 
     res.status(204).send('The task has been deleted');
   } catch (err) {
-    res.status(500).send('Internal Server Error');
-    // next(err);
+    return next(err);
   }
 });
 
