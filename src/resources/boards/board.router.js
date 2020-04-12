@@ -20,6 +20,7 @@ router.route('/:id').get(async (req, res, next) => {
 
     if (!board) {
       const err = new createError(404, 'Board not found');
+
       return next(err);
     }
 
