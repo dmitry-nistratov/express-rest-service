@@ -1,12 +1,22 @@
-let tasks = [];
+let tasks = [
+  {
+    id: '1',
+    title: 'string',
+    order: 0,
+    description: 'string',
+    userId: '1',
+    boardId: '1',
+    columnId: '1'
+  }
+];
 
 const getAllTasks = async () => tasks;
 
-const getTaskById = async id => {
-  const task = tasks.find(item => item.id === id);
+const getTaskById = async (id, boardId) => {
+  const task = tasks.find(item => item.id === id && item.boardId === boardId);
 
   if (!task) {
-    throw new Error('Task not found');
+    return false;
   }
 
   return task;
@@ -16,32 +26,38 @@ const createTask = async user => {
   tasks.push(user);
 };
 
-const updateTask = async user => {
-  const task = await getTaskById(user.id);
+const updateTask = async task => {
+  const existed = tasks.find(item => item.id === task.id);
 
-  if (!task) {
-    throw new Error('Task not found');
+  if (!existed) {
+    return false;
   }
 
-  const index = tasks.indexOf(task);
+  const index = tasks.indexOf(existed);
 
-  tasks[index] = user;
+  tasks[index] = task;
+
+  return task;
 };
 
-const deleteTask = async id => {
-  const task = await getTaskById(id);
+const deleteTask = async (id, boardId) => {
+  const task = await getTaskById(id, boardId);
 
   if (!task) {
-    throw new Error('Task not found');
+    return false;
   }
 
   const index = tasks.indexOf(task);
   tasks.splice(index, 1);
+
+  return true;
 };
 
 const deleteBoardTasks = id => {
   tasks = tasks.filter(curr => curr.boardId !== id);
 };
+
+const getAllUserTasks = async id => tasks.filter(task => task.userId === id);
 
 module.exports = {
   getAllTasks,
@@ -49,5 +65,6 @@ module.exports = {
   createTask,
   updateTask,
   deleteTask,
-  deleteBoardTasks
+  deleteBoardTasks,
+  getAllUserTasks
 };

@@ -6,12 +6,10 @@ const getBoardById = id => boardsRepo.getBoardById(id);
 const createBoard = board => boardsRepo.createBoard(board);
 const updateBoard = board => boardsRepo.updateBoard(board);
 const deleteBoard = async id => {
-  try {
-    tasksRepo.deleteBoardTasks(id);
-    await boardsRepo.deleteBoard(id);
-  } catch (err) {
-    throw new Error(err);
-  }
+  tasksRepo.deleteBoardTasks(id);
+  const result = await boardsRepo.deleteBoard(id);
+
+  return result;
 };
 
 module.exports = {

@@ -1,51 +1,81 @@
 const router = require('express').Router({ mergeParams: true });
+const createError = require('http-errors');
+
 const Task = require('./task.model');
 const tasksService = require('./task.service');
 
-router.route('/').get(async (req, res) => {
-  const tasks = await tasksService.getAllTasks();
-
-  res.json(tasks);
-});
-
-router.route('/:id').get(async (req, res) => {
+router.route('/').get(async (req, res, next) => {
   try {
-    const task = await tasksService.getTaskById(req.params.id);
+    const tasks = await tasksService.getAllTasks();
 
-    res.json(task);
+    res.status(200).json(tasks);
   } catch (err) {
-    res.status(404).send('Task not found');
+    return next(err);
   }
 });
 
-router.route('/').post(async (req, res) => {
-  const boardId = req.params.boardId;
-  const task = new Task({ ...req.body, boardId });
+router.route('/:id').get(async (req, res, next) => {
+  try {
+    const task = await tasksService.getTaskById(
+      req.params.id,
+      req.params.boardId
+    );
 
-  await tasksService.createTask(task);
+    if (!task) {
+      const err = new createError(404, 'Task not found');
+      return next(err);
+    }
 
-  res.json(task);
+    res.status(200).json(task);
+  } catch (err) {
+    return next(err);
+  }
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/').post(async (req, res, next) => {
+  try {
+    const boardId = req.params.boardId;
+    const task = new Task({ ...req.body, boardId });
+
+    await tasksService.createTask(task);
+
+    res.status(200).json(task);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+router.route('/:id').put(async (req, res, next) => {
   try {
     const task = new Task(req.body);
 
-    await tasksService.updateTask(task);
+    const updatedTask = await tasksService.updateTask(task);
 
-    res.json(task);
+    if (!updatedTask) {
+      res.status(404).send('Task not found');
+    }
+
+    res.status(200).json(task);
   } catch (err) {
-    res.status(404).send('Task not found');
+    return next(err);
   }
 });
 
 router.route('/:id').delete(async (req, res) => {
   try {
-    await tasksService.deleteTask(req.params.id);
+    const task = await tasksService.deleteTask(
+      req.params.id,
+      req.params.boardId
+    );
+
+    if (!task) {
+      res.status(404).send('Task not found');
+    }
 
     res.status(204).send('The task has been deleted');
   } catch (err) {
-    res.status(404).send('Task not found');
+    res.status(500).send('Internal Server Error');
+    // next(err);
   }
 });
 

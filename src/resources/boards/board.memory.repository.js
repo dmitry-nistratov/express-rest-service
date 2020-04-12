@@ -1,4 +1,16 @@
-const boards = [];
+const boards = [
+  {
+    id: '1',
+    title: 'string',
+    columns: [
+      {
+        id: '1',
+        title: 'string',
+        order: 0
+      }
+    ]
+  }
+];
 
 const getAllBoards = async () => boards;
 
@@ -16,12 +28,14 @@ const deleteBoard = async id => {
   const board = await getBoardById(id);
 
   if (!board) {
-    throw new Error('Board not found');
+    return false;
   }
 
   const index = boards.indexOf(board);
 
   boards.splice(index, 1);
+
+  return true;
 };
 
 module.exports = {
