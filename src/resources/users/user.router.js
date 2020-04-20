@@ -23,7 +23,7 @@ router.route('/:id').get(async (req, res, next) => {
       return next(err);
     }
 
-    res.status(200).json(user);
+    res.status(200).json(User.toResponse(user));
   } catch (err) {
     return next(err);
   }
@@ -41,12 +41,17 @@ router.route('/').post(async (req, res, next) => {
   }
 });
 
-router.route('/:id').put(async (req, res) => {
-  const user = new User(req.body);
+router.route('/:id').put(async (req, res, next) => {
+  try {
+    const user = await usersService.updateUser({
+      ...req.body,
+      ...req.params
+    });
 
-  await usersService.updateUser(User.toResponse(user));
-
-  res.status(200).json(User.toResponse(user));
+    res.status(200).json(User.toResponse(user));
+  } catch (err) {
+    return next(err);
+  }
 });
 
 router.route('/:id').delete(async (req, res, next) => {

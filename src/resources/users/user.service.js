@@ -1,8 +1,9 @@
-const usersRepo = require('./user.memory.repository');
-const tasksRepo = require('../tasks/task.memory.repository');
+const usersRepo = require('./user.db.repository');
+const tasksRepo = require('../tasks/task.db.repository');
+const Task = require('../tasks/task.model');
 // here data processing before the database or client
 
-const getAllUsers = async () => usersRepo.getAllUsers();
+const getAllUsers = () => usersRepo.getAllUsers();
 
 const getUserById = async id => {
   try {
@@ -13,15 +14,14 @@ const getUserById = async id => {
     throw new Error(err.message);
   }
 };
-const createUser = async user => usersRepo.createUser(user);
+const createUser = user => usersRepo.createUser(user);
 const updateUser = user => usersRepo.updateUser(user);
 const deleteUser = async id => {
   try {
     const assigned = await tasksRepo.getAllUserTasks(id);
-
     Promise.all(
       assigned.map(async task => {
-        tasksRepo.updateTask({ ...task, userId: null });
+        await tasksRepo.updateTask({ ...Task.toResponse(task), userId: null });
       })
     );
 

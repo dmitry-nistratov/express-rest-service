@@ -44,9 +44,10 @@ router.route('/').post(async (req, res, next) => {
 
 router.route('/:id').put(async (req, res, next) => {
   try {
-    const board = new Board(req.body);
-
-    await boardsService.updateBoard(Board.toResponse(board));
+    const board = await boardsService.updateBoard({
+      ...req.body,
+      ...req.params
+    });
 
     res.status(200).json(Board.toResponse(board));
   } catch (err) {
