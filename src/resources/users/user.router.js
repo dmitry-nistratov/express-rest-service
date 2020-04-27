@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const createError = require('http-errors');
 
+const auth = require('../../common/auth');
 const User = require('./user.model');
 const usersService = require('./user.service');
 
-router.route('/').get(async (req, res, next) => {
+router.route('/').get(auth, async (req, res, next) => {
   try {
     const users = await usersService.getAllUsers();
 
@@ -14,7 +15,7 @@ router.route('/').get(async (req, res, next) => {
   }
 });
 
-router.route('/:id').get(async (req, res, next) => {
+router.route('/:id').get(auth, async (req, res, next) => {
   try {
     const user = await usersService.getUserById(req.params.id);
 
@@ -29,19 +30,19 @@ router.route('/:id').get(async (req, res, next) => {
   }
 });
 
-router.route('/').post(async (req, res, next) => {
+router.route('/').post(auth, async (req, res, next) => {
   try {
-    const user = new User(req.body);
+    const user = await usersService.createUser(req.body);
 
-    await usersService.createUser(user);
-
-    res.status(200).json(User.toResponse(user));
+    res
+      .status(200)
+      .json({ ...User.toResponse(user.newUser), token: user.token });
   } catch (err) {
     return next(err);
   }
 });
 
-router.route('/:id').put(async (req, res, next) => {
+router.route('/:id').put(auth, async (req, res, next) => {
   try {
     const user = await usersService.updateUser({
       ...req.body,
@@ -54,7 +55,7 @@ router.route('/:id').put(async (req, res, next) => {
   }
 });
 
-router.route('/:id').delete(async (req, res, next) => {
+router.route('/:id').delete(auth, async (req, res, next) => {
   try {
     const user = await usersService.deleteUser(req.params.id);
 

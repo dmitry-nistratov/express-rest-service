@@ -1,3 +1,5 @@
+const User = require('../users/user.model');
+
 const usersRepo = require('./user.db.repository');
 const tasksRepo = require('../tasks/task.db.repository');
 const Task = require('../tasks/task.model');
@@ -14,7 +16,14 @@ const getUserById = async id => {
     throw new Error(err.message);
   }
 };
-const createUser = user => usersRepo.createUser(user);
+
+const createUser = async user => {
+  const newUser = new User(user);
+  await newUser.save();
+  const token = await newUser.generateAuthToken();
+
+  return { newUser, token };
+};
 const updateUser = user => usersRepo.updateUser(user);
 const deleteUser = async id => {
   try {

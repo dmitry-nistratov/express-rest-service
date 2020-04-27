@@ -1,10 +1,11 @@
 const router = require('express').Router();
 const createError = require('http-errors');
 
+const auth = require('../../common/auth');
 const Board = require('./board.model');
 const boardsService = require('./board.service');
 
-router.route('/').get(async (req, res, next) => {
+router.route('/').get(auth, async (req, res, next) => {
   try {
     const boards = await boardsService.getAllBoards();
 
@@ -14,7 +15,7 @@ router.route('/').get(async (req, res, next) => {
   }
 });
 
-router.route('/:id').get(async (req, res, next) => {
+router.route('/:id').get(auth, async (req, res, next) => {
   try {
     const board = await boardsService.getBoardById(req.params.id);
 
@@ -30,7 +31,7 @@ router.route('/:id').get(async (req, res, next) => {
   }
 });
 
-router.route('/').post(async (req, res, next) => {
+router.route('/').post(auth, async (req, res, next) => {
   try {
     const board = new Board(req.body);
 
@@ -42,7 +43,7 @@ router.route('/').post(async (req, res, next) => {
   }
 });
 
-router.route('/:id').put(async (req, res, next) => {
+router.route('/:id').put(auth, async (req, res, next) => {
   try {
     const board = await boardsService.updateBoard({
       ...req.body,
@@ -55,7 +56,7 @@ router.route('/:id').put(async (req, res, next) => {
   }
 });
 
-router.route('/:id').delete(async (req, res, next) => {
+router.route('/:id').delete(auth, async (req, res, next) => {
   try {
     const board = await boardsService.deleteBoard(req.params.id);
 
